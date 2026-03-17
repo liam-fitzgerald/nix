@@ -5,6 +5,7 @@
     ./shell.nix
     ./git.nix
     ./dev.nix
+    ./dot.nix
   ];
 
   home.stateVersion = "24.05";

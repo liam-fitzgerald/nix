@@ -22,6 +22,13 @@
   ];
 
   system.primaryUser = username;
+  system.defaults.NSGlobalDomain."com.apple.keyboard.fnState" = true;
+
+  # Remap Caps Lock → Control
+  system.keyboard = {
+    enableKeyMapping = true;
+    remapCapsLockToControl = true;
+  };
 
   # ── macOS system defaults ───────────────────────────────────
   # These replace `defaults write` commands you'd run manually.

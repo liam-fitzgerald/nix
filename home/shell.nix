@@ -5,6 +5,7 @@
     enable = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    defaultKeymap = "viins";
 
     shellAliases = {
       ls  = "eza --icons";
