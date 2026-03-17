@@ -1,0 +1,10 @@
+{
+  "languageserver": {
+  "tailwindcss": {
+    "command": "tailwindcss-language-server",
+    "filetypes": ["html", "jsx", "tsx"],
+    "rootPatterns": ["tailwind.config.*"]
+ 
+    }
+  }
+}
