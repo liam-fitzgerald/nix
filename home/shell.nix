@@ -62,17 +62,28 @@
     baseIndex = 1;
     escapeTime = 0;
     extraConfig = ''
-      set -g mouse on
-      set -g renumber-windows on
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
 
-      # Prefix: C-a instead of C-b
-      unbind C-b
-      set -g prefix C-a
-      bind C-a send-prefix
+set-window-option -g mode-keys vi
+set-option -g renumber-windows on
 
-      # Splits
-      bind | split-window -h -c "#{pane_current_path}"
-      bind - split-window -v -c "#{pane_current_path}"
-    '';
+bind J resize-pane -D 5
+bind K resize-pane -U 5
+bind L resize-pane -R 5
+bind H resize-pane -L 5
+
+# List of plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'arcticicestudio/nord-tmux'
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run '~/.tmux/plugins/tpm/tpm'
+     '';
+
+
   };
 }

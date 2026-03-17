@@ -3,4 +3,6 @@ working-directory = inherit
 click-repeat-interval = 500
 auto-update-channel = stable
 font-family = BerkeleyMono Nerd Font
+theme = Nord
+font-feature = -calt, -liga, -dlig
 

@@ -8,7 +8,7 @@
 
     # ── Rust ──────────────────────────────────────────────────
     rustup             # manages toolchains itself; don't also add cargo/rustc
-
+    zig
     # ── C / systems ──────────────────────────────────────────
     gcc
     gnumake
