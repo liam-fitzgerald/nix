@@ -8,6 +8,11 @@
   ];
 
   home.stateVersion = "24.05";
+  # Symlink the entire fonts dir into ~/Library/Fonts/custom/
+  home.file."Library/Fonts/custom" = {
+    source = ../fonts;
+    recursive = true;
+  };
 
   # ── Core user packages ──────────────────────────────────────
   home.packages = with pkgs; [

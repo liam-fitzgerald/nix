@@ -8,7 +8,6 @@
 
     # ── Rust ──────────────────────────────────────────────────
     rustup             # manages toolchains itself; don't also add cargo/rustc
-    git-lfs
 
     # ── C / systems ──────────────────────────────────────────
     gcc

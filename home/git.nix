@@ -7,6 +7,7 @@
     # ── Identity (change these) ─────────────────────────────
     userName  = "Liam";
     userEmail = "liam@axiomatic.systems";  # adjust
+    lfs.enable = true;
 
     extraConfig = {
       init.defaultBranch = "main";
