@@ -13,20 +13,27 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    zig-overlay = {
+      url = "github:mitchellh/zig-overlay";
+    };
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }: let
+  outputs = { self, nixpkgs, nix-darwin, home-manager, zig-overlay, ... }: let
     # ── Change these ──────────────────────────────────────────
     username = "test";
     hostname = "laptop";          # $(scutil --get LocalHostName)
     system   = "aarch64-darwin"; # or "x86_64-darwin" for Intel
+
     # ──────────────────────────────────────────────────────────
   in {
     darwinConfigurations.${hostname} = nix-darwin.lib.darwinSystem {
       inherit system;
       modules = [
+        {
+          nixpkgs.overlays = [ zig-overlay.overlays.default ];
+        }
         ./hosts/darwin.nix
-
         home-manager.darwinModules.home-manager {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;

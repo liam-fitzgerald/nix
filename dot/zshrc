@@ -1,0 +1,58 @@
+
+# direnv hook (auto-load .envrc per project)
+eval "$(direnv hook zsh)"
+export RUST_LLDB=$(xcrun -f lldb)
+export LLDB_DEBUGSERVER_PATH=/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/Resources/debugserver
+export GOPATH="$HOME/go"
+export GOBIN="$HOME/go/bin"
+
+export MANPAGER="nvim +Man!"
+eval $(zoxide init zsh)
+
+# fzf keybindings (Ctrl-R for history, Ctrl-T for files)
+source /Users/test/.vite-plus/env
+
+sample_stacks() {
+  local pid="${1:?usage: sample_stacks <pid> [seconds] [hz]}"
+  local seconds="${2:-10}"
+  local hz="${3:-97}"
+
+  sudo dtrace -x ustackframes=100 -n "
+    profile-${hz} /pid == ${pid}/ { @[ustack()] = count(); }
+    tick-${seconds}s { exit(0); }
+  "
+}
+
+profile_cmd() {
+  local hz="${PROFILE_HZ:-97}"
+  local frames="${PROFILE_FRAMES:-100}"
+
+  "$@" &
+  local pid=$!
+
+  sudo dtrace -x ustackframes="$frames" -n "
+    profile-${hz} /pid == ${pid}/ { @[ustack()] = count(); }
+    proc:::exit /pid == ${pid}/ { exit(0); }
+  " 2>/dev/null
+
+  wait "$pid" 2>/dev/null
+}
+
+# fzf live grep with optional extension args
+# usage: rgg          (all files)
+#        rgg py       (python only)
+#        rgg ts tsx   (multi-extension)
+rgg() {
+  local globs=()
+  for ext in "$@"; do globs+=(-g "*.${ext}"); done
+
+  fzf --disabled --ansi \
+      --bind "start:reload:rg --color=always --line-number --no-heading
+      ${globs[*]} '" \
+      --bind "change:reload:rg --color=always --line-number --no-heading ${globs[*]} {q} || true" \
+      --delimiter ':' \
+      --preview 'bat --color=always {1} --highlight-line {2}' \
+      --preview-window 'right:55%:+{2}/3' \
+  | awk -F: '{print $1 " +" $2}' \
+  | xargs -r $EDITOR
+}

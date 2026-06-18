@@ -2,19 +2,21 @@
 
 {
   home.packages = with pkgs; [
+    (pkgs.lib.hiPrio pkgs.universal-ctags)
     # ── Common Lisp ───────────────────────────────────────────
     sbcl
     # roswell          # if you prefer ros for CL management
 
     # ── Rust ──────────────────────────────────────────────────
     rustup             # manages toolchains itself; don't also add cargo/rustc
-    zig
     # ── C / systems ──────────────────────────────────────────
     gcc
     gnumake
     cmake
     pkg-config
     lldb
+
+    zigpkgs."0.14.0"
 
     # ── Nix tooling ──────────────────────────────────────────
     nil                # nix LSP
@@ -30,6 +32,7 @@
     gh                 # GitHub CLI (also in git.nix via programs.gh)
     just               # task runner
     watchexec          # file watcher
+    go
   ];
 
   # ── Emacs ─────────────────────────────────────────────────
@@ -37,7 +40,11 @@
   # If you want full nix-managed emacs packages, switch to emacs + emacsPackagesFor.
   programs.emacs = {
     enable = true;
-    package = pkgs.emacs30-macport;  # native macOS build
+    package = (pkgs.emacs30-macport.overrideAttrs (old: {
+      postInstall = (old.postInstall or "") + ''
+        rm -f $out/bin/ctags $out/bin/etags
+      '';
+      }));  # native macOS build
     # extraPackages = epkgs: with epkgs; [
     #   slime
     #   magit
@@ -47,6 +54,35 @@
     #   consult
     # ];
   };
+
+  programs.bacon.enable =true;
+
+  programs.neovim  = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+
+       # LSP servers and tools — available to neovim on PATH
+    extraPackages = with pkgs; [
+      # LSPs
+      nil                      # nix
+      lua-language-server
+      rust-analyzer
+      zls                      # zig
+      clang-tools              # clangd for C
+
+      # Formatters
+      nixfmt-rfc-style
+      stylua
+    ];
+  };
+
+  home.sessionVariables = {
+    CC = "${pkgs.llvm}/bin/clang";
+  };
+
+
 
   # ── Direnv (auto-load per-project shells) ──────────────────
   programs.direnv = {
