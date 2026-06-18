@@ -1,6 +1,6 @@
 # dotfiles
 
-Declarative macOS config via [nix-darwin](https://github.com/LnL7/nix-darwin) + [home-manager](https://github.com/nix-community/home-manager).
+Declarative macOS and Linux user environment via [nix-darwin](https://github.com/LnL7/nix-darwin), [NixOS](https://nixos.org/), and [home-manager](https://github.com/nix-community/home-manager).
 
 ## Fresh machine setup
 
@@ -17,16 +17,34 @@ cd ~/.config/nixos && nix run nix-darwin -- switch --flake ".#$(scutil --get Loc
 ## Daily usage
 
 ```bash
-rebuild                    # alias: darwin-rebuild switch --flake ~/.config/nixos
+rebuild                    # alias picks darwin-rebuild, nixos-rebuild, or home-manager
 ```
 
 Edit any `.nix` file, run `rebuild`, done.
+
+## Linux / NixOS
+
+Standalone Home Manager on Linux:
+
+```bash
+home-manager switch --flake ~/.config/nix#test@x86_64-linux
+```
+
+NixOS:
+
+```bash
+sudo nixos-rebuild switch --flake ~/.config/nix#linux
+```
+
+The built-in `linux` NixOS target includes generic EFI/root filesystem defaults in `hosts/nixos.nix`. On a real machine, override those with your machine's hardware configuration if it differs from `/dev/disk/by-label/NIXOS`.
 
 ## Structure
 
 ```
 flake.nix              # inputs + wiring
 hosts/darwin.nix       # system-level: macOS defaults, brew casks, networking
+hosts/linux.nix        # reusable NixOS workstation module
+hosts/nixos.nix        # generic NixOS host wrapper
 home/
   default.nix          # user packages
   shell.nix            # zsh, starship, tmux
@@ -48,9 +66,9 @@ bootstrap.sh           # fresh machine setup script
 {
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   outputs = { nixpkgs, ... }: let
-    pkgs = nixpkgs.legacyPackages.aarch64-darwin;
+    pkgs = nixpkgs.legacyPackages.x86_64-linux;
   in {
-    devShells.aarch64-darwin.default = pkgs.mkShell {
+    devShells.x86_64-linux.default = pkgs.mkShell {
       packages = [ pkgs.sbcl pkgs.lmdb ];
     };
   };

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   imports = [
@@ -9,10 +9,15 @@
   ];
 
   home.stateVersion = "24.05";
-  # Symlink the entire fonts dir into ~/Library/Fonts/custom/
-  home.file."Library/Fonts/custom" = {
+
+  home.file."Library/Fonts/custom" = lib.mkIf pkgs.stdenv.isDarwin {
     source = ../fonts;
     recursive = true;
+  };
+
+  fonts.fontconfig.enable = lib.mkIf pkgs.stdenv.isLinux true;
+  xdg.dataFile."fonts/BerkeleyMonoNerdFont-Regular.otf" = lib.mkIf pkgs.stdenv.isLinux {
+    source = ../fonts/BerkeleyMonoNerdFont-Regular.otf;
   };
 
   # ── Core user packages ──────────────────────────────────────
@@ -21,13 +26,13 @@
     ripgrep
     fd
     bat
-    eza                  # modern ls
+    eza # modern ls
     jq
     fzf
     htop
     tree
     tldr
-    tokei                # code stats
+    tokei # code stats
     direnv
 
     # Networking / debug

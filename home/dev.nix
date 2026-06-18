@@ -1,5 +1,16 @@
 { pkgs, ... }:
 
+let
+  emacsPackage =
+    if pkgs.stdenv.isDarwin && pkgs ? emacs30-macport then
+      pkgs.emacs30-macport.overrideAttrs (old: {
+        postInstall = (old.postInstall or "") + ''
+          rm -f $out/bin/ctags $out/bin/etags
+        '';
+      })
+    else
+      pkgs.emacs30 or pkgs.emacs;
+in
 {
   home.packages = with pkgs; [
     (pkgs.lib.hiPrio pkgs.universal-ctags)
@@ -8,7 +19,7 @@
     # roswell          # if you prefer ros for CL management
 
     # ── Rust ──────────────────────────────────────────────────
-    rustup             # manages toolchains itself; don't also add cargo/rustc
+    rustup # manages toolchains itself; don't also add cargo/rustc
     # ── C / systems ──────────────────────────────────────────
     gcc
     gnumake
@@ -19,19 +30,19 @@
     zigpkgs."0.14.0"
 
     # ── Nix tooling ──────────────────────────────────────────
-    nil                # nix LSP
-    nixfmt-rfc-style   # nix formatter
-    nix-tree           # visualize derivation trees
-    nix-diff           # diff closures
+    nil # nix LSP
+    nixfmt # nix formatter
+    nix-tree # visualize derivation trees
+    nix-diff # diff closures
 
     # ── Data / serialisation ─────────────────────────────────
     sqlite
-    lmdb               # for PLAN/Shrine dev
+    lmdb # for PLAN/Shrine dev
 
     # ── Misc dev ─────────────────────────────────────────────
-    gh                 # GitHub CLI (also in git.nix via programs.gh)
-    just               # task runner
-    watchexec          # file watcher
+    gh # GitHub CLI (also in git.nix via programs.gh)
+    just # task runner
+    watchexec # file watcher
     go
   ];
 
@@ -40,11 +51,7 @@
   # If you want full nix-managed emacs packages, switch to emacs + emacsPackagesFor.
   programs.emacs = {
     enable = true;
-    package = (pkgs.emacs30-macport.overrideAttrs (old: {
-      postInstall = (old.postInstall or "") + ''
-        rm -f $out/bin/ctags $out/bin/etags
-      '';
-      }));  # native macOS build
+    package = emacsPackage;
     # extraPackages = epkgs: with epkgs; [
     #   slime
     #   magit
@@ -55,25 +62,25 @@
     # ];
   };
 
-  programs.bacon.enable =true;
+  programs.bacon.enable = true;
 
-  programs.neovim  = {
+  programs.neovim = {
     enable = true;
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
 
-       # LSP servers and tools — available to neovim on PATH
+    # LSP servers and tools — available to neovim on PATH
     extraPackages = with pkgs; [
       # LSPs
-      nil                      # nix
+      nil # nix
       lua-language-server
       rust-analyzer
-      zls                      # zig
-      clang-tools              # clangd for C
+      zls # zig
+      clang-tools # clangd for C
 
       # Formatters
-      nixfmt-rfc-style
+      nixfmt
       stylua
     ];
   };
@@ -82,11 +89,9 @@
     CC = "${pkgs.llvm}/bin/clang";
   };
 
-
-
   # ── Direnv (auto-load per-project shells) ──────────────────
   programs.direnv = {
     enable = true;
-    nix-direnv.enable = true;  # cached nix shells — huge speedup
+    nix-direnv.enable = true; # cached nix shells — huge speedup
   };
 }

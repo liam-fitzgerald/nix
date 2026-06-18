@@ -5,15 +5,17 @@
     enable = true;
 
     # ── Identity (change these) ─────────────────────────────
-    userName  = "Liam";
-    userEmail = "liam@axiomatic.systems";  # adjust
     lfs.enable = true;
 
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Liam";
+        email = "liam@axiomatic.systems"; # adjust
+      };
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
-      rerere.enabled = true;               # remember conflict resolutions
+      rerere.enabled = true; # remember conflict resolutions
       diff.algorithm = "histogram";
       merge.conflictstyle = "zdiff3";
 
@@ -23,22 +25,23 @@
       # commit.gpgsign = true;
     };
 
-    delta = {
-      enable = true;    # better diffs
-      options = {
-        navigate = true;
-        side-by-side = true;
-        line-numbers = true;
-      };
-    };
-
     ignores = [
       ".DS_Store"
       "*.swp"
       ".direnv/"
       ".envrc.local"
-      "result"           # nix build output symlink
+      "result" # nix build output symlink
     ];
+  };
+
+  programs.delta = {
+    enable = true; # better diffs
+    enableGitIntegration = true;
+    options = {
+      navigate = true;
+      side-by-side = true;
+      line-numbers = true;
+    };
   };
 
   programs.gh = {
